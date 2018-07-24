@@ -34,4 +34,16 @@ public class TestController {
         return "success";
     }
 
+    @RequestMapping("/del")
+    public Object del() {
+        try {
+            String jobName="job1";
+            String jobGroupName="job1";
+            String jobTime="0/5 * * * * ? ";
+            quartzManager.deleteJob(jobName, jobGroupName);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return "success";
+    }
 }
