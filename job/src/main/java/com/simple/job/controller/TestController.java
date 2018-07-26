@@ -22,12 +22,11 @@ public class TestController {
     @RequestMapping("/add")
     public Object add() {
         try {
-            String jobName="job1";
-            String jobGroupName="job1";
-            String jobTime="0/5 * * * * ? ";
-            SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+            String jobName = "job1";
+            String jobGroupName = "job1";
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
             System.out.println("TestQuartJob 开始启动 》》》》》："+dateFormat.format(new Date()));
-            quartzManager.addJob(QuartzJob.class, jobName, jobGroupName, jobTime);
+            quartzManager.addJob(QuartzJob.class, QuartzJob.buildTrigger(), jobName, jobGroupName);
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -39,7 +38,6 @@ public class TestController {
         try {
             String jobName="job1";
             String jobGroupName="job1";
-            String jobTime="0/5 * * * * ? ";
             quartzManager.deleteJob(jobName, jobGroupName);
         } catch (Exception e) {
             e.printStackTrace();

@@ -22,78 +22,32 @@ public class QuartzManager {
     /**
      * 增加一个job
      * @param jobClass 任务实现类
+     * @param trigger 调度策略
      * @param jobName 任务名称
-     *  @param jobGroupName 任务组名
-     * @param jobTime 时间表达式 （如：0/5 * * * * ? ）
+     * @param jobGroupName 任务组名
      */
-    public  void addJob(Class<? extends Job> jobClass, String jobName,String jobGroupName,String jobTime) {
+    public  void addJob(Class<? extends Job> jobClass, Trigger trigger, String jobName, String jobGroupName) {
         try {
+
             //创建jobDetail实例，绑定Job实现类
             //指明job的名称，所在组的名称，以及绑定job类
             JobDetail jobDetail = JobBuilder.newJob(jobClass)
                     .withIdentity(jobName, jobGroupName)//任务名称和组构成任务key
                     .build();
-            //定义调度触发规则
-            //使用cornTrigger规则
-            Trigger trigger = TriggerBuilder.newTrigger()
-                    .withIdentity(jobName, jobGroupName)//触发器key
-                    .withSchedule(CronScheduleBuilder.cronSchedule(jobTime))
-                    .startAt(DateBuilder.futureDate(1, IntervalUnit.SECOND))
-                    .startNow().build();
+
             //把作业和触发器注册到任务调度中
             scheduler.scheduleJob(jobDetail, trigger);
+
             // 启动
             if (!scheduler.isShutdown()) {
                 scheduler.start();
             }
+
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
 
-    /**
-     * 增加一个job
-     * @param jobClass  任务实现类
-     * @param jobName  任务名称
-     * @param jobGroupName 任务组名
-     * @param jobTime  时间表达式 (这是每隔多少秒为一次任务)
-     */
-    public void addJob(Class<? extends Job> jobClass, String jobName,String jobGroupName,int jobTime){
-        addJob(jobClass,jobName,jobGroupName,jobTime,-1);
-    }
-
-    /**
-     * 增加一个job
-     * @param jobClass 任务实现类
-     * @param jobName  任务名称
-     * @param jobGroupName 任务组名
-     * @param jobTime  时间表达式 (这是每隔多少秒为一次任务)
-     * @param jobTimes  运行的次数 （<0:表示不限次数）
-     */
-    public void addJob(Class<? extends Job> jobClass, String jobName,String jobGroupName,int jobTime,int jobTimes){
-        try {
-            JobDetail jobDetail = JobBuilder.newJob(jobClass)
-                    .withIdentity(jobName, jobGroupName)//任务名称和组构成任务key
-                    .build();
-            //使用simpleTrigger规则
-            Trigger trigger=null;
-            if(jobTimes<0){
-                trigger=TriggerBuilder.newTrigger().withIdentity(jobName, jobGroupName)
-                        .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(1).withIntervalInSeconds(jobTime))
-                        .startNow().build();
-            }else{
-                trigger=TriggerBuilder.newTrigger().withIdentity(jobName, jobGroupName)
-                        .withSchedule(SimpleScheduleBuilder.repeatSecondlyForever(1).withIntervalInSeconds(jobTime).withRepeatCount(jobTimes))
-                        .startNow().build();
-            }
-            scheduler.scheduleJob(jobDetail, trigger);
-            if (!scheduler.isShutdown()) {
-                scheduler.start();
-            }
-        } catch (SchedulerException e) {
-            e.printStackTrace();
-        }
-    }
 
     /**
      * 修改 一个job的 时间表达式
@@ -101,7 +55,7 @@ public class QuartzManager {
      * @param jobGroupName
      * @param jobTime
      */
-    public void updateJob(String jobName,String jobGroupName,String jobTime){
+    public void updateJob(String jobName, String jobGroupName, String jobTime){
         try {
             TriggerKey triggerKey = TriggerKey.triggerKey(jobName, jobGroupName);
             CronTrigger trigger = (CronTrigger) scheduler.getTrigger(triggerKey);
@@ -161,7 +115,7 @@ public class QuartzManager {
      * @param jobName
      * @param jobGroupName
      */
-    public void runAJobNow(String jobName,String jobGroupName){
+    public void runJobNow(String jobName,String jobGroupName){
         try {
             JobKey jobKey = JobKey.jobKey(jobName, jobGroupName);
             scheduler.triggerJob(jobKey);
