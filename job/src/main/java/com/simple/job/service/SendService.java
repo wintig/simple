@@ -2,6 +2,7 @@ package com.simple.job.service;
 
 import org.springframework.stereotype.Service;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 /**
@@ -12,7 +13,8 @@ import java.util.Date;
 public class SendService {
 
     public void send() {
-        System.out.println("【任务启动】 ： " + new Date());
+        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
+        System.out.println("发送了一条消息 ："+dateFormat.format(new Date()) );
     }
 
 }

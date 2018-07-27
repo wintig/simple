@@ -7,9 +7,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.Serializable;
-import java.text.SimpleDateFormat;
 import java.time.LocalTime;
-import java.util.Date;
 
 
 
@@ -24,9 +22,7 @@ public class QuartzJob implements Job, Serializable {
     public SendService sendService;
 
     @Override
-    public void execute(JobExecutionContext arg0) throws JobExecutionException {
-        SimpleDateFormat dateFormat=new SimpleDateFormat("yyyy-MM-dd HH-mm-ss");
-        System.out.println("TestQuartJob 的运行 ："+dateFormat.format(new Date()));
+    public void execute(JobExecutionContext context) throws JobExecutionException {
         sendService.send();
     }
 
@@ -34,7 +30,7 @@ public class QuartzJob implements Job, Serializable {
     public static Trigger buildTrigger() {
 
         Trigger trigger = TriggerBuilder.newTrigger().withIdentity("Send_Audit", "Send_Group")
-                .withSchedule(SimpleScheduleBuilder.simpleSchedule().withRepeatCount(0))
+                .withSchedule(SimpleScheduleBuilder.simpleSchedule().withRepeatCount(20).withIntervalInSeconds(1))
                 .startAt(DateUtils.localTime2date(LocalTime.now().plusSeconds(2)))  //延迟2秒发送
                 .build();
 
